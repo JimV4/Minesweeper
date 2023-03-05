@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -26,8 +27,10 @@ public class Game {
     private static int width;
     private static int height;
     private Stage primaryStage;
+    private Scene primaryScene;
     private BorderPane root2;
     private FXMLLoader fx;
+    private static GridPane root;
     // array with all squares
     public static Square[][] squares; //= new Square [height][width];
 
@@ -45,7 +48,8 @@ public class Game {
         this.superMine = superMine;
         this.width = width;
         this.height = height;
-        //this.primaryStage = primaryStage;
+        this.primaryStage = primaryStage;
+        this.primaryScene = primaryScene;
         this.root2 = root2;
         //this.fx = fx;
         revealedCounter = height * width - minesNumber;
@@ -54,7 +58,8 @@ public class Game {
 
     // place squares on the board. Fill the squares array
     public void initBoard ()  {
-        GridPane root = new GridPane();
+        BorderPane borderPane = new BorderPane();
+        root = new GridPane();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 Square square = new Square(x, y, false, false);
@@ -62,10 +67,8 @@ public class Game {
                 square.setMinHeight(20.0);
                 square.setMinWidth(20.0);
                 root.add(square, y, height - 1 - x);
-                //root2.getChildren().add(square);
             }
         }
-
 
         // fill the neighbors of each square
         for (int i = 0; i < height; i++) {
@@ -134,13 +137,16 @@ public class Game {
             root.getColumnConstraints().add(new ColumnConstraints(10, Control.USE_COMPUTED_SIZE, Double.POSITIVE_INFINITY, Priority.ALWAYS, HPos.CENTER, true));
             root.getRowConstraints().add(new RowConstraints(10, Control.USE_COMPUTED_SIZE, Double.POSITIVE_INFINITY, Priority.ALWAYS, VPos.CENTER, true));
         }
-        root2.getChildren().add(root);
-        root2.setCenter(root);
-        Scene newScene = new Scene(root2, 500, 500);
-        Stage primaryStage2 = new Stage();
-        primaryStage2.setScene(newScene);
-        primaryStage2.setTitle("MediaLabMinesweeper");
-        primaryStage2.show();
+        borderPane.setTop(root2);
+        borderPane.setBottom(root);
+       /// root.getChildren().add(root2);
+        //root2.setCenter(myGroup);
+        Scene newScene = new Scene(borderPane, 500, 500);
+
+
+        primaryStage.setScene(newScene);
+        primaryStage.setTitle("MediaLabMinesweeper");
+        primaryStage.show();
     }
     public static void lose() {
         for (int i = 0; i < Game.squares.length; i++) {

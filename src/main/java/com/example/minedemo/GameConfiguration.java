@@ -19,6 +19,7 @@ public class GameConfiguration {
     private static File inputFile;
     private static String SCENARIO_ID;
     private static Stage myPrimaryStage;
+    private static Scene primaryScene;
     public static void gameRules(Stage primaryStage) {
         myPrimaryStage = primaryStage;
         int lineCounter = 0;
@@ -44,7 +45,8 @@ public class GameConfiguration {
         // Add menus to menu bar
         menuBar.getMenus().addAll(ApplicationMenu, DetailsMenu);
         root2.setTop(menuBar);
-        myPrimaryStage.setScene(new Scene(root2, 500, 500));
+        Scene primaryScene = new Scene(root2, 500, 500);
+        myPrimaryStage.setScene(primaryScene);
         myPrimaryStage.setTitle("MediaLabMinesweeper");
         myPrimaryStage.show();
 
