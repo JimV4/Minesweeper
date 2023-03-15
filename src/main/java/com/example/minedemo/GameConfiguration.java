@@ -97,7 +97,7 @@ public class GameConfiguration {
                         }
                         if (!input5.getText().isEmpty())
                             time = Integer.valueOf(input5.getText());
-                        inputFile = new File(SCENARIO_ID + ".txt");
+                        inputFile = new File("medialab/" + SCENARIO_ID + ".txt");
                         try {
                             if (inputFile.createNewFile()) {
                                 FileOutputStream fos = new FileOutputStream(inputFile);
@@ -149,7 +149,7 @@ public class GameConfiguration {
                     public void handle(MouseEvent mouseEvent) {
                         int lineCounter = 0;
                         try {
-                            File inputFile2 = new File(ScenarioIDinput.getText() + ".txt");
+                            File inputFile2 = new File("medialab/" + ScenarioIDinput.getText() + ".txt");
                             if (inputFile2.exists()) {
                                 Scanner in = new Scanner(inputFile2);
                                 while (in.hasNextLine()) {
@@ -256,6 +256,14 @@ public class GameConfiguration {
                         }
                     }
                 });
+            }
+        });
+
+        // Handle Exit Button
+        Exit.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                System.exit(1);
             }
         });
 

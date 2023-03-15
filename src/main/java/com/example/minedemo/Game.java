@@ -271,8 +271,8 @@ public class Game {
     // στο αρχειο.
     public void initMines() {
         try {
-            FileWriter writer = new FileWriter("mines.txt");
-            Scanner mineScanner = new Scanner("mines.txt");
+            FileWriter writer = new FileWriter("medialab/mines.txt");
+            Scanner mineScanner = new Scanner("medialab/mines.txt");
 
             mineScanner.useDelimiter(",");
             // fill in mines.txt with mines coordinates
@@ -291,12 +291,12 @@ public class Game {
                         randomX = coords[0];
                         randomY = coords[1];
                     }
-                    writer.write(String.valueOf(randomX));
+                    writer.write(String.valueOf(randomY));
                     writer.write(", ");
                     xVector.add(randomX);
                     yVector.add(randomY);
 
-                    writer.write(String.valueOf(randomY));
+                    writer.write(String.valueOf(randomX));
                     writer.write(", ");
                     writer.write("0");
                     writer.write("\n");
@@ -333,10 +333,10 @@ public class Game {
                         randomX = coords[0];
                         randomY = coords[1];
                     }
-                    writer.write(String.valueOf(randomX));
+                    writer.write(String.valueOf(randomY));
                     writer.write(", ");
 
-                    writer.write(String.valueOf(randomY));
+                    writer.write(String.valueOf(randomX));
                     writer.write(", ");
 
                     writer.write(String.valueOf(superMineExists));
