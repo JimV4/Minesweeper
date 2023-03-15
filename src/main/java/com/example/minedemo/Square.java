@@ -34,6 +34,10 @@ public class Square extends StackPane {
     }
     public void setHasSuperMine (boolean f) { this.hasSuperMine = f; }
 
+    public static int getFlagCounter() {
+        return flagCounter;
+    }
+
     private int neighborBombs() {
         int bombCounter = 0;
         for (int j = 0; j < neighbors.size(); j++) {
@@ -134,7 +138,7 @@ public class Square extends StackPane {
                         Game.lose();
                     }
                 }
-                else if (mouseEvent.getButton() == MouseButton.SECONDARY)
+                else if (mouseEvent.getButton() == MouseButton.SECONDARY) {
                     if (hasSuperMine && movesCounter <= 4) {
                         isRevealed = true;
                         for (int i = 0; i < Game.squares.length; i++) {
@@ -143,11 +147,21 @@ public class Square extends StackPane {
                             }
                         }
 
-                    }
-                    else
+                    } else {
                         squareRevealWithFlag();
+                        System.out.println(xCord);
+                        System.out.println(yCord);
+                    }
+                }
             }
         }));
+    }
+
+    public void revealMine() {
+        if (hasBomb) {
+            text.setText("X");
+            text.setVisible(true);
+        }
     }
 
     public Square(int xCord, int yCord, boolean isRevealed, boolean hasBomb) {
