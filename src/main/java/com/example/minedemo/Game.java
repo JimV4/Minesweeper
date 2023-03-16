@@ -47,6 +47,7 @@ public class Game {
         return minesNumber;
     }
 
+    
     public Game(int difficulty, int minesNumber, int time, int superMine, int width, int height, Stage primaryStage, BorderPane root2) {
         this.difficulty = difficulty;
         this.minesNumber = minesNumber;
@@ -209,6 +210,7 @@ public class Game {
         myTimer.scheduleAtFixedRate(task, 0, 1000);
 
     }
+
     public static void lose() {
         for (int i = 0; i < Game.squares.length; i++) {
             for (int j = 0; j < Game.squares[0].length; j++) {
@@ -226,6 +228,7 @@ public class Game {
         exceptionStage.setTitle("Error!");
         exceptionStage.show();
     }
+
     public static void win() {
         for (int i = 0; i < Game.squares.length; i++) {
             for (int j = 0; j < Game.squares[0].length; j++) {
