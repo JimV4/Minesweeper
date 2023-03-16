@@ -1,16 +1,20 @@
 package com.example.minedemo;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.*;
@@ -27,9 +31,14 @@ public class Game {
     private static int height;
     private Stage primaryStage;
     private BorderPane root2;
-    private FXMLLoader fx;
+    private static GridPane root;
     // array with all squares
     public static Square[][] squares; //= new Square [height][width];
+
+    public Text timeRemaining;
+    private Timer myTimer;
+    private TimerTask task;
+    private int timeAppearingOnScreen;
 
     // vector with all the mines
     private Vector<Mine> mines = new Vector<Mine>();
@@ -38,6 +47,7 @@ public class Game {
         return minesNumber;
     }
 
+    
     public Game(int difficulty, int minesNumber, int time, int superMine, int width, int height, Stage primaryStage, BorderPane root2) {
         this.difficulty = difficulty;
         this.minesNumber = minesNumber;
@@ -45,16 +55,16 @@ public class Game {
         this.superMine = superMine;
         this.width = width;
         this.height = height;
-        //this.primaryStage = primaryStage;
+        this.primaryStage = primaryStage;
         this.root2 = root2;
-        //this.fx = fx;
         revealedCounter = height * width - minesNumber;
         squares = new Square [this.height][this.width];
     }
 
     // place squares on the board. Fill the squares array
     public void initBoard ()  {
-        GridPane root = new GridPane();
+        BorderPane borderPane = new BorderPane();
+        root = new GridPane();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 Square square = new Square(x, y, false, false);
@@ -62,10 +72,8 @@ public class Game {
                 square.setMinHeight(20.0);
                 square.setMinWidth(20.0);
                 root.add(square, y, height - 1 - x);
-                //root2.getChildren().add(square);
             }
         }
-
 
         // fill the neighbors of each square
         for (int i = 0; i < height; i++) {
@@ -134,29 +142,109 @@ public class Game {
             root.getColumnConstraints().add(new ColumnConstraints(10, Control.USE_COMPUTED_SIZE, Double.POSITIVE_INFINITY, Priority.ALWAYS, HPos.CENTER, true));
             root.getRowConstraints().add(new RowConstraints(10, Control.USE_COMPUTED_SIZE, Double.POSITIVE_INFINITY, Priority.ALWAYS, VPos.CENTER, true));
         }
-        root2.getChildren().add(root);
-        root2.setCenter(root);
-        Scene newScene = new Scene(root2, 500, 500);
-        Stage primaryStage2 = new Stage();
-        primaryStage2.setScene(newScene);
-        primaryStage2.setTitle("MediaLabMinesweeper");
-        primaryStage2.show();
+        borderPane.setTop(root2);
+        ToolBar gameDetails = new ToolBar();
+        gameDetails.setPrefWidth(500);
+        gameDetails.setPrefHeight(50);
+        Text minesNumberText = new Text("Total Mines: " + Integer.toString(minesNumber) + "   ");
+        minesNumberText.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
+
+        Text minesMarked = new Text("Marked Squares: " + Integer.toString(Square.getFlagCounter()) + "   ");
+        minesMarked.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
+                minesMarked.setText("Marked Squares: " + Integer.toString(Square.getFlagCounter()) + "   ");
+
+            }
+        });
+        minesMarked.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
+
+        timeAppearingOnScreen = GameConfiguration.getTime();
+
+        timeRemaining = new Text("Time Remaining: " + Integer.toString(timeAppearingOnScreen));
+        timeRemaining.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
+//        myTimer = new Timer();
+//
+//        task = new TimerTask() {
+//            @Override
+//            public void run() {
+//                if (GameConfiguration.getTime() > 0) {
+//                    timeRemaining.setText("Time Remaining: " + String.valueOf(GameConfiguration.getTime() - 1));
+//                    timeRemaining.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
+//                } else if (GameConfiguration.getTime() == 0) {
+//                    lose();
+//                }
+//
+//            }
+//        };
+//        myTimer.scheduleAtFixedRate(task, 0, 1000);
+        gameDetails.getItems().addAll(minesNumberText, minesMarked, timeRemaining);
+
+        //borderPane.setTop(gameDetails);
+        root2.setCenter(gameDetails);
+        borderPane.setBottom(root);
+        //root.setConstraints(Priority.ALWAYS, Priority.ALWAYS);
+
+        Scene newScene = new Scene(borderPane, 550, 550);
+
+        primaryStage.setScene(newScene);
+        primaryStage.setTitle("MediaLabMinesweeper");
+
+        primaryStage.show();
     }
+
+    public void handleTime() {
+        myTimer = new Timer();
+        task = new TimerTask() {
+            @Override
+            public void run() {
+                if (timeAppearingOnScreen > 0) {
+                    timeRemaining.setText("Time Remaining: " + String.valueOf(timeAppearingOnScreen - 1));
+                    timeRemaining.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
+                } else if (timeAppearingOnScreen == 0) {
+                    lose();
+                }
+
+            }
+        };
+        myTimer.scheduleAtFixedRate(task, 0, 1000);
+
+    }
+
     public static void lose() {
         for (int i = 0; i < Game.squares.length; i++) {
             for (int j = 0; j < Game.squares[0].length; j++) {
                 Game.squares[i][j].setDisable(true);
             }
         }
-        System.out.println("You Lose");
+        VBox exceptionVbox = new VBox();
+        Text exceptionText = new Text("Sorry! You Lose :(");
+        exceptionText.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
+        exceptionVbox.getChildren().addAll(exceptionText);
+        exceptionVbox.setAlignment(Pos.CENTER);
+        Scene exceptionScene = new Scene(exceptionVbox, 300, 100);
+        Stage exceptionStage = new Stage();
+        exceptionStage.setScene(exceptionScene);
+        exceptionStage.setTitle("Error!");
+        exceptionStage.show();
     }
+
     public static void win() {
         for (int i = 0; i < Game.squares.length; i++) {
             for (int j = 0; j < Game.squares[0].length; j++) {
                 Game.squares[i][j].setDisable(true);
             }
         }
-        System.out.println(("You Win!"));
+        VBox exceptionVbox = new VBox();
+        Text exceptionText = new Text("Congratulations! You win!");
+        exceptionText.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
+        exceptionVbox.getChildren().addAll(exceptionText);
+        exceptionVbox.setAlignment(Pos.CENTER);
+        Scene exceptionScene = new Scene(exceptionVbox, 300, 100);
+        Stage exceptionStage = new Stage();
+        exceptionStage.setScene(exceptionScene);
+        exceptionStage.setTitle("Error!");
+        exceptionStage.show();
     }
 
     // αυτη η μεθοδος, διορθωνει το αν δυο ναρκες ειναι ακριβως στο ιδιο τετραγωνο
@@ -182,13 +270,12 @@ public class Game {
         return coords;
     }
 
-
     // αυτη η μεθοδος αρχικοποιει τις ναρκες γραφοντας στο mines.txt. Δηλαδη τοποθετει τυχαια ναρκες και υπερναρκη
     // στο αρχειο.
     public void initMines() {
         try {
-            FileWriter writer = new FileWriter("mines.txt");
-            Scanner mineScanner = new Scanner("mines.txt");
+            FileWriter writer = new FileWriter("medialab/mines.txt");
+            Scanner mineScanner = new Scanner("medialab/mines.txt");
 
             mineScanner.useDelimiter(",");
             // fill in mines.txt with mines coordinates
@@ -207,12 +294,12 @@ public class Game {
                         randomX = coords[0];
                         randomY = coords[1];
                     }
-                    writer.write(String.valueOf(randomX));
+                    writer.write(String.valueOf(randomY));
                     writer.write(", ");
                     xVector.add(randomX);
                     yVector.add(randomY);
 
-                    writer.write(String.valueOf(randomY));
+                    writer.write(String.valueOf(randomX));
                     writer.write(", ");
                     writer.write("0");
                     writer.write("\n");
@@ -249,10 +336,10 @@ public class Game {
                         randomX = coords[0];
                         randomY = coords[1];
                     }
-                    writer.write(String.valueOf(randomX));
+                    writer.write(String.valueOf(randomY));
                     writer.write(", ");
 
-                    writer.write(String.valueOf(randomY));
+                    writer.write(String.valueOf(randomX));
                     writer.write(", ");
 
                     writer.write(String.valueOf(superMineExists));
@@ -282,12 +369,20 @@ public class Game {
         }
     }
 
-//    public void play() {
-//        EventHandler<MouseEvent> eventHandler = new EventHandler<MouseEvent>() {
+//    public void timerDecrease() {
+//        //myTimer = new Timer();
+//        task = new TimerTask() {
 //            @Override
-//            public void handle (MouseEvent e) {
-//                System.out.println("pressed");
+//            public void run() {
+//                if (GameConfiguration.getTime() > 0) {
+//                    timeRemaining.setText("Time Remaining: " + Integer.toString(GameConfiguration.getTime() - 1));
+//                    timeRemaining.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
+//                }
+//                else if (GameConfiguration.getTime() == 0) {
+//                    lose();
+//                }
 //            }
 //        };
 //    }
+
 }

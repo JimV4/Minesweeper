@@ -12,15 +12,30 @@ import java.util.Vector;
 public class Square extends StackPane {
     private int xCord;
     private int yCord;
+
+    /**
+     * getter που επιστρέφει την x-συντεταγμένη του τρέχοντος τετραγώνου
+     * @return xCord
+     */
     public int getxCord () {
         return xCord;
     }
+
+    /**
+     * getter που επιστρέφει την y-συντεταγμένη του τρέχοντος τετραγώνου
+     * @return yCord
+     */
     public int getyCord () {
         return yCord;
     }
     public Vector<Square> neighbors;
     private boolean isRevealed;
     private boolean hasBomb;
+
+    /**
+     * getter που επιστρέφει boolean για το αν το τρέχον τετράγωνο έχει νάρκη ή όχι
+     * @return hasBomb
+     */
     public boolean getHasBomb() {
         return hasBomb;
     }
@@ -29,10 +44,27 @@ public class Square extends StackPane {
     private static int movesCounter = 0;
     private Text text = new Text();
 
+    /**
+     * setter που θέτει στο τρέχον τετράγωνο, να έχει νάρκη
+     * @param f boolean για το αν το τρέχον τετράγωνο έχει νάρκη ή όχι
+     */
     public void setHasBomb (boolean f) {
         this.hasBomb = f;
     }
+
+    /**
+     * setter που θέτει στο τρέχον τετράγωνο, να έχει υπερ-νάρκη
+     * @param f boolean για το αν το τρέχον τετράγωνο έχει υπερ-νάρκη ή όχι
+     */
     public void setHasSuperMine (boolean f) { this.hasSuperMine = f; }
+
+    /**
+     * getter για τον αριθμό των σημαιών που έχουν χρησιμοποιηθεί
+     * @return flagCounter
+     */
+    public static int getFlagCounter() {
+        return flagCounter;
+    }
 
     private int neighborBombs() {
         int bombCounter = 0;
@@ -116,6 +148,9 @@ public class Square extends StackPane {
         }
     }
 
+    /**
+     * συνάρτηση για την αποκάλυψη των τετραγώνων (γενική)
+     */
     public void reveal() {
         this.setOnMouseClicked((new EventHandler<MouseEvent>() {
             @Override
@@ -134,7 +169,7 @@ public class Square extends StackPane {
                         Game.lose();
                     }
                 }
-                else if (mouseEvent.getButton() == MouseButton.SECONDARY)
+                else if (mouseEvent.getButton() == MouseButton.SECONDARY) {
                     if (hasSuperMine && movesCounter <= 4) {
                         isRevealed = true;
                         for (int i = 0; i < Game.squares.length; i++) {
@@ -143,13 +178,33 @@ public class Square extends StackPane {
                             }
                         }
 
-                    }
-                    else
+                    } else {
                         squareRevealWithFlag();
+                        System.out.println(xCord);
+                        System.out.println(yCord);
+                    }
+                }
             }
         }));
     }
 
+    /**
+     * συνάρτηση που αποκαλύπτει τη νάρκη, αν αυτή υπάρχει στο τετράγωνο
+     */
+    public void revealMine() {
+        if (hasBomb) {
+            text.setText("X");
+            text.setVisible(true);
+        }
+    }
+
+    /**
+     * κατασκευαστής της κλάσης Square
+     * @param xCord η x-συντεταγμένη του τετραγώνου στο πλέγμα
+     * @param yCord η y-συνεταγμένη του τετραγώνου στο πλέγμα
+     * @param isRevealed boolean για το αν το τετράγωνο έχει αποκαλυφθεί ή όχι
+     * @param hasBomb   boolean για το αν το τετράγωνο περιέχει νάρκη ή όχι
+     */
     public Square(int xCord, int yCord, boolean isRevealed, boolean hasBomb) {
         this.setStyle("-fx-background-color: red; -fx-border-style: solid; -fx-border-width: 3; -fx-border-color: black;");
         this.xCord = xCord;
