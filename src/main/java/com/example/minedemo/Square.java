@@ -131,9 +131,6 @@ public class Square extends StackPane {
         if (isRevealed)
             return;
         if (hasBomb) {
-            //            System.out.println("End!");
-            //            text.setText("X");
-            //            setStyle("-fx-background-color: red; -fx-border-style: solid; -fx-border-width: 3; -fx-border-color: black;");
             return;
         }
 

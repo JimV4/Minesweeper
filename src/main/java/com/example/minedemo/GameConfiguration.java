@@ -165,6 +165,7 @@ public class GameConfiguration {
                     public void handle(MouseEvent mouseEvent) {
                         int lineCounter = 0;
                         try {
+                            SCENARIO_ID = ScenarioIDinput.getText();
                             File inputFile2 = new File("medialab/" + ScenarioIDinput.getText() + ".txt");
                             if (inputFile2.exists()) {
                                 Scanner in = new Scanner(inputFile2);
@@ -264,6 +265,9 @@ public class GameConfiguration {
         Start.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                if (SCENARIO_ID == null) {
+                    return;
+                }
                 Game newGame = new Game(GameConfiguration.getDifficulty(), GameConfiguration.getMinesNumber(), GameConfiguration.getTime(), GameConfiguration.getSuperMine(), GameConfiguration.getHeight(), GameConfiguration.getWidth(), myPrimaryStage, root2);
                 newGame.initBoard();
                 newGame.initMines();
@@ -355,9 +359,6 @@ public class GameConfiguration {
         });
 
     }
-
-
-
 
     public static int getHeight() {
         return height;

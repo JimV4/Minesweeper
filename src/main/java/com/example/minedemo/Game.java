@@ -1,19 +1,11 @@
 package com.example.minedemo;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
-import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -43,21 +35,6 @@ public class Game {
     private static Text minesMarked;
     private static Timer myTimer = new Timer();
     private TimerTask myTask;
-//    private TimerTask myTask = new TimerTask() {
-//        @Override
-//        public void run() {
-//            if (timeAppearingOnScreen > 0) {
-//                timeAppearingOnScreen -= 1;
-//                timeRemaining.setText("Time Remaining: " + String.valueOf(timeAppearingOnScreen));
-//                timeRemaining.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
-//            } else if (timeAppearingOnScreen == 0) {
-//                timeRemaining.setText("Time Remaining: " + String.valueOf(timeAppearingOnScreen));
-//                timeRemaining.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
-//                myTimer.cancel();
-//                lose();
-//            }
-//        }
-//    };
     private static int timeAppearingOnScreen;
 
     // vector with all the mines
@@ -89,8 +66,14 @@ public class Game {
             for (int y = 0; y < height; y++) {
                 Square square = new Square(x, y, false, false);
                 squares[x][y] = square;
-                square.setMinHeight(20.0);
-                square.setMinWidth(20.0);
+                if (this.difficulty == 2) {
+                    square.setMinHeight(20.0);
+                    square.setMinWidth(20.0);
+                }
+                else if (this.difficulty == 1) {
+                    square.setMinHeight(50.0);
+                    square.setMinWidth(50.0);
+                }
                 root.add(square, y, height - 1 - x);
             }
         }
@@ -179,11 +162,8 @@ public class Game {
 
         gameDetails.getItems().addAll(minesNumberText, minesMarked, timeRemaining);
 
-        //borderPane.setTop(gameDetails);
         root2.setCenter(gameDetails);
         borderPane.setBottom(root);
-        //root.setConstraints(Priority.ALWAYS, Priority.ALWAYS);
-
         Scene newScene = new Scene(borderPane, 550, 550);
 
         primaryStage.setScene(newScene);
@@ -221,22 +201,16 @@ public class Game {
     private static void writeRounds(int winner) {
         try {
             File roundsFile = new File("medialab/rounds.txt");
-//            FileOutputStream roundsStream = new FileOutputStream(roundsFile);
-//            BufferedWriter roundsWriter = new BufferedWriter(new OutputStreamWriter(roundsStream));
             FileWriter roundsWriter = new FileWriter("medialab/rounds.txt", true);
             roundsWriter.write(String.valueOf(minesNumber));
             roundsWriter.write("\n");
-            //roundsWriter.write(",");
             roundsWriter.write(String.valueOf(Square.getMovesCounter()));
             roundsWriter.write("\n");
-            //roundsWriter.write(",");
             roundsWriter.write(String.valueOf(time - timeAppearingOnScreen));
             roundsWriter.write("\n");
-            //roundsWriter.write(",");
             roundsWriter.write(String.valueOf(winner));
             roundsWriter.write("\n");
             roundsWriter.close();
-
         }
         catch (IOException e) {
             System.out.println("An error occured while writing to 'rounds.txt'");
@@ -288,8 +262,6 @@ public class Game {
         exceptionStage.setTitle("Error!");
         exceptionStage.show();
     }
-
-
 
     // αυτη η μεθοδος, διορθωνει το αν δυο ναρκες ειναι ακριβως στο ιδιο τετραγωνο
     private int [] fix(Vector<Integer> xVector, Vector<Integer> yVector, int randomX, int randomY) {
