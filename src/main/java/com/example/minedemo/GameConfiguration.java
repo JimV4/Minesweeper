@@ -231,7 +231,7 @@ public class GameConfiguration {
                                     } else {
                                         in2.close();
                                         inputFile2.delete();
-                                        throw new InvalidDescriptionException("Error! File must have 4 lines!");
+                                        throw new InvalidDescriptionException("Error! SCENARIO-ID must have 4 lines!");
                                     }
                                 } catch (InvalidDescriptionException e) {
                                     System.out.println(e.getMessage());
