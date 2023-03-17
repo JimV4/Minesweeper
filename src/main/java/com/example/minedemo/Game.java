@@ -25,7 +25,9 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Game {
     private int difficulty;
     private static int minesNumber;
-    private int time;
+
+    private int winner;
+    private static int time;
     private int superMine;
     private static int width;
     private static int height;
@@ -36,6 +38,8 @@ public class Game {
     public static Square[][] squares; //= new Square [height][width];
 
     public Text timeRemaining;
+
+    private static Text minesMarked;
     private Timer myTimer;
     private TimerTask task;
     private int timeAppearingOnScreen;
@@ -149,35 +153,14 @@ public class Game {
         Text minesNumberText = new Text("Total Mines: " + Integer.toString(minesNumber) + "   ");
         minesNumberText.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
 
-        Text minesMarked = new Text("Marked Squares: " + Integer.toString(Square.getFlagCounter()) + "   ");
-        minesMarked.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
-                minesMarked.setText("Marked Squares: " + Integer.toString(Square.getFlagCounter()) + "   ");
-
-            }
-        });
+        minesMarked = new Text("Marked Squares: " + Integer.toString(Square.getFlagCounter()) + "   ");
         minesMarked.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
 
         timeAppearingOnScreen = GameConfiguration.getTime();
 
         timeRemaining = new Text("Time Remaining: " + Integer.toString(timeAppearingOnScreen));
         timeRemaining.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
-//        myTimer = new Timer();
-//
-//        task = new TimerTask() {
-//            @Override
-//            public void run() {
-//                if (GameConfiguration.getTime() > 0) {
-//                    timeRemaining.setText("Time Remaining: " + String.valueOf(GameConfiguration.getTime() - 1));
-//                    timeRemaining.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
-//                } else if (GameConfiguration.getTime() == 0) {
-//                    lose();
-//                }
-//
-//            }
-//        };
-//        myTimer.scheduleAtFixedRate(task, 0, 1000);
+
         gameDetails.getItems().addAll(minesNumberText, minesMarked, timeRemaining);
 
         //borderPane.setTop(gameDetails);
@@ -193,22 +176,54 @@ public class Game {
         primaryStage.show();
     }
 
+    public static void setMinesMarked(int flagCounter) {
+        minesMarked.setText("Marked Squares: " + Integer.toString(flagCounter) + "   ");
+        minesMarked.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
+    }
+
     public void handleTime() {
         myTimer = new Timer();
         task = new TimerTask() {
             @Override
             public void run() {
                 if (timeAppearingOnScreen > 0) {
-                    timeRemaining.setText("Time Remaining: " + String.valueOf(timeAppearingOnScreen - 1));
+                    timeAppearingOnScreen -= 1;
+                    timeRemaining.setText("Time Remaining: " + String.valueOf(timeAppearingOnScreen));
                     timeRemaining.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
                 } else if (timeAppearingOnScreen == 0) {
+                    timeRemaining.setText("Time Remaining: " + String.valueOf(timeAppearingOnScreen));
+                    timeRemaining.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
                     lose();
                 }
 
             }
         };
         myTimer.scheduleAtFixedRate(task, 0, 1000);
+    }
 
+    private static void writeRounds(int winner) {
+        try {
+            File roundsFile = new File("medialab/rounds.txt");
+//            FileOutputStream roundsStream = new FileOutputStream(roundsFile);
+//            BufferedWriter roundsWriter = new BufferedWriter(new OutputStreamWriter(roundsStream));
+            FileWriter roundsWriter = new FileWriter("medialab/rounds.txt", true);
+            roundsWriter.write(String.valueOf(minesNumber));
+            roundsWriter.write("\n");
+            //roundsWriter.write(",");
+            roundsWriter.write(String.valueOf(Square.getMovesCounter()));
+            roundsWriter.write("\n");
+            //roundsWriter.write(",");
+            roundsWriter.write(String.valueOf(time));
+            roundsWriter.write("\n");
+            //roundsWriter.write(",");
+            roundsWriter.write(String.valueOf(winner));
+            roundsWriter.write("\n");
+            roundsWriter.close();
+
+        }
+        catch (IOException e) {
+            System.out.println("An error occured while writing to 'rounds.txt'");
+        }
     }
 
     public static void lose() {
@@ -217,6 +232,7 @@ public class Game {
                 Game.squares[i][j].setDisable(true);
             }
         }
+        writeRounds(0);
         VBox exceptionVbox = new VBox();
         Text exceptionText = new Text("Sorry! You Lose :(");
         exceptionText.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
@@ -235,6 +251,7 @@ public class Game {
                 Game.squares[i][j].setDisable(true);
             }
         }
+        writeRounds(1);
         VBox exceptionVbox = new VBox();
         Text exceptionText = new Text("Congratulations! You win!");
         exceptionText.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
@@ -246,6 +263,8 @@ public class Game {
         exceptionStage.setTitle("Error!");
         exceptionStage.show();
     }
+
+
 
     // αυτη η μεθοδος, διορθωνει το αν δυο ναρκες ειναι ακριβως στο ιδιο τετραγωνο
     private int [] fix(Vector<Integer> xVector, Vector<Integer> yVector, int randomX, int randomY) {
@@ -368,21 +387,4 @@ public class Game {
             System.out.println("An error occured while writing to 'mines.txt'");
         }
     }
-
-//    public void timerDecrease() {
-//        //myTimer = new Timer();
-//        task = new TimerTask() {
-//            @Override
-//            public void run() {
-//                if (GameConfiguration.getTime() > 0) {
-//                    timeRemaining.setText("Time Remaining: " + Integer.toString(GameConfiguration.getTime() - 1));
-//                    timeRemaining.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
-//                }
-//                else if (GameConfiguration.getTime() == 0) {
-//                    lose();
-//                }
-//            }
-//        };
-//    }
-
 }

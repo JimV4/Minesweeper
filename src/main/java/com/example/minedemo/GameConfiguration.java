@@ -12,7 +12,10 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Stack;
+import java.util.Vector;
 
 public class GameConfiguration {
     private static int height, width, minesNumber, time, superMine, difficulty;
@@ -86,42 +89,55 @@ public class GameConfiguration {
                 submit.setOnMouseClicked((new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent mouseEvent) {
-                        SCENARIO_ID = input1.getText();
-                        if (!input2.getText().isEmpty())
-                            difficulty = Integer.valueOf(input2.getText());
-                        if (!input3.getText().isEmpty())
-                            minesNumber = Integer.valueOf(input3.getText());
-                        if (!input4.getText().isEmpty()) {
-                            System.out.println("here");
-                            superMine = Integer.valueOf(input4.getText());
-                        }
-                        if (!input5.getText().isEmpty())
-                            time = Integer.valueOf(input5.getText());
-                        inputFile = new File("medialab/" + SCENARIO_ID + ".txt");
                         try {
-                            if (inputFile.createNewFile()) {
-                                FileOutputStream fos = new FileOutputStream(inputFile);
-                                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
-                                if (!input2.getText().isEmpty()) {
-                                    bw.write(String.valueOf(difficulty));
-                                    bw.newLine();
-                                }
-                                if (!input3.getText().isEmpty()) {
-                                    bw.write(String.valueOf(minesNumber));
-                                    bw.newLine();
-                                }
-                                if (!input5.getText().isEmpty()) {
-                                    bw.write(String.valueOf(time));
-                                    bw.newLine();
-                                }
-                                if (!input4.getText().isEmpty()) {
-                                    bw.write(String.valueOf(superMine));
-                                    bw.newLine();
-                                }
-                                bw.close();
+                            SCENARIO_ID = input1.getText();
+                            if (!input2.getText().isEmpty())
+                                difficulty = Integer.valueOf(input2.getText());
+                            if (!input3.getText().isEmpty())
+                                minesNumber = Integer.valueOf(input3.getText());
+                            if (!input4.getText().isEmpty()) {
+                                System.out.println("here");
+                                superMine = Integer.valueOf(input4.getText());
                             }
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
+                            if (!input5.getText().isEmpty())
+                                time = Integer.valueOf(input5.getText());
+                            inputFile = new File("medialab/" + SCENARIO_ID + ".txt");
+                            try {
+                                if (inputFile.createNewFile()) {
+                                    FileOutputStream fos = new FileOutputStream(inputFile);
+                                    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+                                    if (!input2.getText().isEmpty()) {
+                                        bw.write(String.valueOf(difficulty));
+                                        bw.newLine();
+                                    }
+                                    if (!input3.getText().isEmpty()) {
+                                        bw.write(String.valueOf(minesNumber));
+                                        bw.newLine();
+                                    }
+                                    if (!input5.getText().isEmpty()) {
+                                        bw.write(String.valueOf(time));
+                                        bw.newLine();
+                                    }
+                                    if (!input4.getText().isEmpty()) {
+                                        bw.write(String.valueOf(superMine));
+                                        bw.newLine();
+                                    }
+                                    bw.close();
+                                }
+                            } catch (IOException e) {
+                                try {
+                                    throw new InvalidValueException("Error! Invalid description!");
+                                } catch (InvalidValueException ex) {
+
+                                }
+                            }
+                        }
+                        catch (NumberFormatException e) {
+                            try {
+                                throw new InvalidValueException("Error! Invalid description!");
+                            } catch (InvalidValueException ex) {
+
+                            }
                         }
                         CreateStage.close();
                     }
@@ -139,7 +155,7 @@ public class GameConfiguration {
                 vboxLoad.getChildren().addAll(ScenarioIDlabel, ScenarioIDinput, okButton);
 
                 Stage LoadStage = new Stage();
-                Scene LoadScene = new Scene(vboxLoad, 100, 100);
+                Scene LoadScene = new Scene(vboxLoad, 250, 100);
                 LoadStage.setTitle("Load Game");
                 LoadStage.setScene(LoadScene);
                 LoadStage.show();
@@ -156,7 +172,6 @@ public class GameConfiguration {
                                     in.nextLine();
                                     lineCounter++;
                                 }
-                                System.out.println(lineCounter);
                                 in.close();
                                 Scanner in2 = new Scanner(inputFile2);
                                 try {
@@ -170,26 +185,33 @@ public class GameConfiguration {
                                             in2.close();
 
                                             if (difficulty != 1 && difficulty != 2) {
+                                                inputFile2.delete();
                                                 throw new InvalidValueException("Error! Invalid description!");
                                             }
                                             if (difficulty == 1) {
                                                 if (minesNumber < 9 || minesNumber > 11) {
+                                                    inputFile2.delete();
                                                     throw new InvalidValueException("Error! Invalid description!");
                                                 }
                                                 if (time < 120 || time > 180) {
+                                                    inputFile2.delete();
                                                     throw new InvalidValueException("Error! Invalid description!");
                                                 }
                                                 if (superMine != 0) {
+                                                    inputFile2.delete();
                                                     throw new InvalidValueException("Error! Invalid description!");
                                                 }
                                             } else if (difficulty == 2) {
                                                 if (minesNumber < 35 || minesNumber > 45) {
+                                                    inputFile2.delete();
                                                     throw new InvalidValueException("Error! Invalid description!");
                                                 }
                                                 if (time < 240 || time > 360) {
+                                                    inputFile2.delete();
                                                     throw new InvalidValueException("Error! Invalid description!");
                                                 }
                                                 if (superMine != 1) {
+                                                    inputFile2.delete();
                                                     throw new InvalidValueException("Error! Invalid description!");
                                                 }
                                             }
@@ -200,15 +222,18 @@ public class GameConfiguration {
                                             } else if (difficulty == 2) {
                                                 height = 16;
                                                 width = 16;
-                                            } else
+                                            } else {
+                                                inputFile2.delete();
                                                 throw new InvalidValueException("Error! Invalid description!");
+                                            }
 
                                         } catch (InvalidValueException e) {
                                             System.out.println(e.getMessage());
                                         }
                                     } else {
                                         in2.close();
-                                        throw new InvalidDescriptionException("Error! 'SCENARIO-ID.txt' must have 4 lines!");
+                                        inputFile2.delete();
+                                        throw new InvalidDescriptionException("Error! File must have 4 lines!");
                                     }
                                 } catch (InvalidDescriptionException e) {
                                     System.out.println(e.getMessage());
@@ -254,6 +279,7 @@ public class GameConfiguration {
                                 newGame.squares[i][j].setDisable(true);
                             }
                         }
+                        newGame.lose();
                     }
                 });
             }
@@ -264,6 +290,67 @@ public class GameConfiguration {
             @Override
             public void handle(ActionEvent actionEvent) {
                 System.exit(1);
+            }
+        });
+
+        Rounds.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                int lineCounter = 0;
+                Vector<String> minesVector = new Vector<String>();
+                Vector<String> movesVector = new Vector<String>();
+                Vector<String> timeVector = new Vector<String>();
+                Vector<String> winnerVector = new Vector<String>();
+                Scanner roundsScanner = new Scanner("medialab/rounds.txt");
+                BufferedReader roundsReader;
+                try {
+                    roundsReader = new BufferedReader(new FileReader("medialab/rounds.txt"));
+                    String line;
+                    int help = 0;
+                    //roundsScanner.useDelimiter(",");
+                    while ((line = roundsReader.readLine()) != null){
+                        if (help == 4)
+                            help = 0;
+                        if (help == 0)
+                            minesVector.add(line);
+                        else if (help == 1)
+                            movesVector.add(line);
+                        else if (help == 2)
+                            timeVector.add(line);
+                        else if (help == 3)
+                            winnerVector.add(line);
+                        help++;
+                        lineCounter++;
+                    }
+                    System.out.println(lineCounter);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.exit(1);
+                }
+
+                roundsScanner.close();
+                VBox roundsBox = new VBox();
+                String winner = "";
+                lineCounter = lineCounter / 4;
+                for (int i = 0; i < 5; i++) {
+                    if (lineCounter - i - 1 < 0) {
+                        break;
+                    }
+                    if (Integer.valueOf(winnerVector.get(lineCounter - i - 1)) == 0)
+                        winner = "PC";
+                    else
+                        winner = "Player";
+                    Text GameStats = new Text("Game" + String.valueOf(i + 1) + ": Total Mines: " + String.valueOf(minesVector.get(lineCounter - i - 1)) + " Total Moves: " + String.valueOf(movesVector.get(lineCounter - i - 1)) + " Total Time: " + String.valueOf(timeVector.get(lineCounter - i - 1)) + " Winner: " + winner);
+                    GameStats.setStyle("-fx-font-size: 14;");
+                    roundsBox.getChildren().add(GameStats);
+                }
+                roundsBox.setAlignment(Pos.CENTER);
+                Scene roundsScene = new Scene(roundsBox, 500, 300);
+                Stage roundsStage = new Stage();
+                roundsStage.setScene(roundsScene);
+                roundsStage.setTitle("Rounds");
+                roundsStage.show();
             }
         });
 

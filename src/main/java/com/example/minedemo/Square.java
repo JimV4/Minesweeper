@@ -42,6 +42,14 @@ public class Square extends StackPane {
     private boolean hasSuperMine;
     private static int flagCounter = 0;
     private static int movesCounter = 0;
+
+    /**
+     * getter που επιστρέφει το πλήθος των προσπαθειών στο τρέχον παιχνίδι
+     * @return movesCounter
+     */
+    public static int getMovesCounter() {
+        return movesCounter;
+    }
     private Text text = new Text();
 
     /**
@@ -180,9 +188,8 @@ public class Square extends StackPane {
 
                     } else {
                         squareRevealWithFlag();
-                        System.out.println(xCord);
-                        System.out.println(yCord);
                     }
+                    Game.setMinesMarked(flagCounter);
                 }
             }
         }));
