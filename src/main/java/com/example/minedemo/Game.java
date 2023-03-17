@@ -1,5 +1,6 @@
 package com.example.minedemo;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -40,9 +41,24 @@ public class Game {
     public Text timeRemaining;
 
     private static Text minesMarked;
-    private Timer myTimer;
-    private TimerTask task;
-    private int timeAppearingOnScreen;
+    private static Timer myTimer = new Timer();
+    private TimerTask myTask;
+//    private TimerTask myTask = new TimerTask() {
+//        @Override
+//        public void run() {
+//            if (timeAppearingOnScreen > 0) {
+//                timeAppearingOnScreen -= 1;
+//                timeRemaining.setText("Time Remaining: " + String.valueOf(timeAppearingOnScreen));
+//                timeRemaining.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
+//            } else if (timeAppearingOnScreen == 0) {
+//                timeRemaining.setText("Time Remaining: " + String.valueOf(timeAppearingOnScreen));
+//                timeRemaining.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
+//                myTimer.cancel();
+//                lose();
+//            }
+//        }
+//    };
+    private static int timeAppearingOnScreen;
 
     // vector with all the mines
     private Vector<Mine> mines = new Vector<Mine>();
@@ -183,22 +199,23 @@ public class Game {
 
     public void handleTime() {
         myTimer = new Timer();
-        task = new TimerTask() {
+        myTask = new TimerTask() {
             @Override
             public void run() {
                 if (timeAppearingOnScreen > 0) {
-                    timeAppearingOnScreen -= 1;
                     timeRemaining.setText("Time Remaining: " + String.valueOf(timeAppearingOnScreen));
                     timeRemaining.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
+                    timeAppearingOnScreen -= 1;
                 } else if (timeAppearingOnScreen == 0) {
+                    System.out.println("here");
+                    System.out.println(timeAppearingOnScreen);
                     timeRemaining.setText("Time Remaining: " + String.valueOf(timeAppearingOnScreen));
                     timeRemaining.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
                     lose();
                 }
-
             }
         };
-        myTimer.scheduleAtFixedRate(task, 0, 1000);
+        myTimer.scheduleAtFixedRate(myTask, 0, 1000);
     }
 
     private static void writeRounds(int winner) {
@@ -213,7 +230,7 @@ public class Game {
             roundsWriter.write(String.valueOf(Square.getMovesCounter()));
             roundsWriter.write("\n");
             //roundsWriter.write(",");
-            roundsWriter.write(String.valueOf(time));
+            roundsWriter.write(String.valueOf(time - timeAppearingOnScreen));
             roundsWriter.write("\n");
             //roundsWriter.write(",");
             roundsWriter.write(String.valueOf(winner));
@@ -227,25 +244,33 @@ public class Game {
     }
 
     public static void lose() {
+        if (timeAppearingOnScreen >= 0)
+            myTimer.cancel();
         for (int i = 0; i < Game.squares.length; i++) {
             for (int j = 0; j < Game.squares[0].length; j++) {
                 Game.squares[i][j].setDisable(true);
             }
         }
-        writeRounds(0);
-        VBox exceptionVbox = new VBox();
-        Text exceptionText = new Text("Sorry! You Lose :(");
-        exceptionText.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
-        exceptionVbox.getChildren().addAll(exceptionText);
-        exceptionVbox.setAlignment(Pos.CENTER);
-        Scene exceptionScene = new Scene(exceptionVbox, 300, 100);
-        Stage exceptionStage = new Stage();
-        exceptionStage.setScene(exceptionScene);
-        exceptionStage.setTitle("Error!");
-        exceptionStage.show();
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                writeRounds(0);
+                VBox exceptionVbox = new VBox();
+                Text exceptionText = new Text("Sorry! You Lose :(");
+                exceptionText.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
+                exceptionVbox.getChildren().addAll(exceptionText);
+                exceptionVbox.setAlignment(Pos.CENTER);
+                Scene exceptionScene = new Scene(exceptionVbox, 300, 100);
+                Stage exceptionStage = new Stage();
+                exceptionStage.setScene(exceptionScene);
+                exceptionStage.setTitle("Error!");
+                exceptionStage.show();
+            }
+        });
     }
 
     public static void win() {
+        myTimer.cancel();
         for (int i = 0; i < Game.squares.length; i++) {
             for (int j = 0; j < Game.squares[0].length; j++) {
                 Game.squares[i][j].setDisable(true);
