@@ -152,7 +152,9 @@ public class Game {
         Text minesNumberText = new Text("Total Mines: " + Integer.toString(minesNumber) + "   ");
         minesNumberText.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
 
-        minesMarked = new Text("Marked Squares: " + Integer.toString(Square.getFlagCounter()) + "   ");
+        Square.setMovesCounter(0);
+        Square.setFlagCounter(0);
+        minesMarked = new Text("Marked Squares: 0");
         minesMarked.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
 
         timeAppearingOnScreen = GameConfiguration.getTime();
@@ -178,6 +180,7 @@ public class Game {
     }
 
     public void handleTime() {
+        myTimer.cancel();
         myTimer = new Timer();
         myTask = new TimerTask() {
             @Override
@@ -187,8 +190,6 @@ public class Game {
                     timeRemaining.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
                     timeAppearingOnScreen -= 1;
                 } else if (timeAppearingOnScreen == 0) {
-                    System.out.println("here");
-                    System.out.println(timeAppearingOnScreen);
                     timeRemaining.setText("Time Remaining: " + String.valueOf(timeAppearingOnScreen));
                     timeRemaining.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
                     lose();

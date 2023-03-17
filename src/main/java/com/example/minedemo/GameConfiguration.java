@@ -12,9 +12,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.Stack;
 import java.util.Vector;
 
 public class GameConfiguration {

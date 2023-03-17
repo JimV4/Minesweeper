@@ -50,6 +50,12 @@ public class Square extends StackPane {
     public static int getMovesCounter() {
         return movesCounter;
     }
+
+    /**
+     * setter που θέτει στο πλήθος των κινήσεων την τιμή v
+     * @param v η τιμή που θα ανατεθεί στο πλήθος των κινήσεων
+     */
+    public static void setMovesCounter(int v) { movesCounter = v; }
     private Text text = new Text();
 
     /**
@@ -73,6 +79,12 @@ public class Square extends StackPane {
     public static int getFlagCounter() {
         return flagCounter;
     }
+
+    /**
+     * setter που θέτει την τιμή v στον αριθμό των σημαιών που έχουν χρησιμοποιηθεί
+     * @param v παράμετρος για τον αριθμό των σημαιών που έχουν χρησιμοποιηθεί
+     */
+    public static void setFlagCounter(int v) { flagCounter = v; }
 
     private int neighborBombs() {
         int bombCounter = 0;
