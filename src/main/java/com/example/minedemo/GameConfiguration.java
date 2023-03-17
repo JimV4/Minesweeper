@@ -280,7 +280,8 @@ public class GameConfiguration {
                                 newGame.squares[i][j].setDisable(true);
                             }
                         }
-                        newGame.lose();
+                        if (!newGame.getGameFinished())
+                            newGame.lose();
                     }
                 });
             }

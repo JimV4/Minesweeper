@@ -19,6 +19,7 @@ public class Game {
     private int difficulty;
     private static int minesNumber;
 
+    private static boolean gameFinished = false;
     private int winner;
     private static int time;
     private int superMine;
@@ -43,6 +44,7 @@ public class Game {
     public static int getMinesNumber() {
         return minesNumber;
     }
+    public static boolean getGameFinished() { return gameFinished; }
 
     
     public Game(int difficulty, int minesNumber, int time, int superMine, int width, int height, Stage primaryStage, BorderPane root2) {
@@ -60,6 +62,7 @@ public class Game {
 
     // place squares on the board. Fill the squares array
     public void initBoard ()  {
+        gameFinished = false;
         BorderPane borderPane = new BorderPane();
         root = new GridPane();
         for (int x = 0; x < width; x++) {
@@ -219,6 +222,7 @@ public class Game {
     }
 
     public static void lose() {
+        gameFinished = true;
         if (timeAppearingOnScreen >= 0)
             myTimer.cancel();
         for (int i = 0; i < Game.squares.length; i++) {
@@ -245,6 +249,7 @@ public class Game {
     }
 
     public static void win() {
+        gameFinished = true;
         myTimer.cancel();
         for (int i = 0; i < Game.squares.length; i++) {
             for (int j = 0; j < Game.squares[0].length; j++) {
