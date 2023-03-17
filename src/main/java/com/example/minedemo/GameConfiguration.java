@@ -94,7 +94,6 @@ public class GameConfiguration {
                             if (!input3.getText().isEmpty())
                                 minesNumber = Integer.valueOf(input3.getText());
                             if (!input4.getText().isEmpty()) {
-                                System.out.println("here");
                                 superMine = Integer.valueOf(input4.getText());
                             }
                             if (!input5.getText().isEmpty())
@@ -324,7 +323,6 @@ public class GameConfiguration {
                         help++;
                         lineCounter++;
                     }
-                    System.out.println(lineCounter);
 
                 } catch (Exception e) {
                     e.printStackTrace();
